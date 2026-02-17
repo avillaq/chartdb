@@ -681,11 +681,15 @@ export const StorageProvider: React.FC<React.PropsWithChildren> = ({
             await Promise.all(promises);
 
             if (isAuthenticated && user?.id) {
-                await syncDiagramToCloud({
-                    diagram,
-                    userId: user.id,
-                    accessToken: session?.access_token,
-                });
+                try {
+                    await syncDiagramToCloud({
+                        diagram,
+                        userId: user.id,
+                        accessToken: session?.access_token,
+                    });
+                } catch (error) {
+                    console.error('Cloud sync failed on addDiagram', error);
+                }
             }
         },
         [
@@ -883,11 +887,18 @@ export const StorageProvider: React.FC<React.PropsWithChildren> = ({
                 });
 
                 if (diagram) {
-                    await syncDiagramToCloud({
-                        diagram,
-                        userId: user.id,
-                        accessToken: session?.access_token,
-                    });
+                    try {
+                        await syncDiagramToCloud({
+                            diagram,
+                            userId: user.id,
+                            accessToken: session?.access_token,
+                        });
+                    } catch (error) {
+                        console.error(
+                            'Cloud sync failed on updateDiagram',
+                            error
+                        );
+                    }
                 }
             }
         },
@@ -907,11 +918,15 @@ export const StorageProvider: React.FC<React.PropsWithChildren> = ({
             ]);
 
             if (isAuthenticated && user?.id) {
-                await deleteDiagramFromCloud({
-                    diagramId: id,
-                    userId: user.id,
-                    accessToken: session?.access_token,
-                });
+                try {
+                    await deleteDiagramFromCloud({
+                        diagramId: id,
+                        userId: user.id,
+                        accessToken: session?.access_token,
+                    });
+                } catch (error) {
+                    console.error('Cloud sync failed on deleteDiagram', error);
+                }
             }
         },
         [db, isAuthenticated, user?.id, session?.access_token]

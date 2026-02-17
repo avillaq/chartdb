@@ -14,6 +14,10 @@ const request = async ({
     accessToken: string;
     body?: unknown;
 }) => {
+    if (method === 'POST' && Array.isArray(body) && body.length === 0) {
+        return;
+    }
+
     const response = await fetch(`${supabaseUrl}/rest/v1/${path}`, {
         method,
         headers: {
@@ -126,6 +130,50 @@ export const syncDiagramToCloud = async ({
                 diagram_id: diagram.id,
                 user_id: userId,
                 data: relationship,
+            })),
+        }),
+        request({
+            path: 'db_dependencies',
+            method: 'POST',
+            accessToken,
+            body: (diagram.dependencies ?? []).map((dependency) => ({
+                id: dependency.id,
+                diagram_id: diagram.id,
+                user_id: userId,
+                data: dependency,
+            })),
+        }),
+        request({
+            path: 'areas',
+            method: 'POST',
+            accessToken,
+            body: (diagram.areas ?? []).map((area) => ({
+                id: area.id,
+                diagram_id: diagram.id,
+                user_id: userId,
+                data: area,
+            })),
+        }),
+        request({
+            path: 'db_custom_types',
+            method: 'POST',
+            accessToken,
+            body: (diagram.customTypes ?? []).map((customType) => ({
+                id: customType.id,
+                diagram_id: diagram.id,
+                user_id: userId,
+                data: customType,
+            })),
+        }),
+        request({
+            path: 'notes',
+            method: 'POST',
+            accessToken,
+            body: (diagram.notes ?? []).map((note) => ({
+                id: note.id,
+                diagram_id: diagram.id,
+                user_id: userId,
+                data: note,
             })),
         }),
     ]);
