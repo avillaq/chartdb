@@ -8,6 +8,4 @@ import './globals.css';
 import { App } from './app';
 import './i18n/i18n';
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-    <App />
-);
+ReactDOM.createRoot(document.getElementById('root')!).render(<App />);
