@@ -12,10 +12,14 @@ import type { Area } from '@/lib/domain/area';
 import type { DBCustomType } from '@/lib/domain/db-custom-type';
 import type { DiagramFilter } from '@/lib/domain/diagram-filter/diagram-filter';
 import type { Note } from '@/lib/domain/note';
+import { useAuth } from '@/context/auth-context/use-auth';
+import { deleteDiagramFromCloud, syncDiagramToCloud } from '@/lib/cloud-sync';
 
 export const StorageProvider: React.FC<React.PropsWithChildren> = ({
     children,
 }) => {
+    const { user, session, isAuthenticated } = useAuth();
+
     const db = useMemo(() => {
         const dexieDB = new Dexie('ChartDB') as Dexie & {
             diagrams: EntityTable<
@@ -675,6 +679,18 @@ export const StorageProvider: React.FC<React.PropsWithChildren> = ({
             );
 
             await Promise.all(promises);
+
+            if (isAuthenticated && user?.id) {
+                try {
+                    await syncDiagramToCloud({
+                        diagram,
+                        userId: user.id,
+                        accessToken: session?.access_token,
+                    });
+                } catch (error) {
+                    console.error('Cloud sync failed on addDiagram', error);
+                }
+            }
         },
         [
             db,
@@ -684,6 +700,9 @@ export const StorageProvider: React.FC<React.PropsWithChildren> = ({
             addRelationship,
             addTable,
             addNote,
+            isAuthenticated,
+            user?.id,
+            session?.access_token,
         ]
     );
 
@@ -856,8 +875,34 @@ export const StorageProvider: React.FC<React.PropsWithChildren> = ({
                     }),
                 ]);
             }
+
+            if (isAuthenticated && user?.id) {
+                const diagram = await getDiagram(attributes.id ?? id, {
+                    includeTables: true,
+                    includeRelationships: true,
+                    includeDependencies: true,
+                    includeAreas: true,
+                    includeCustomTypes: true,
+                    includeNotes: true,
+                });
+
+                if (diagram) {
+                    try {
+                        await syncDiagramToCloud({
+                            diagram,
+                            userId: user.id,
+                            accessToken: session?.access_token,
+                        });
+                    } catch (error) {
+                        console.error(
+                            'Cloud sync failed on updateDiagram',
+                            error
+                        );
+                    }
+                }
+            }
         },
-        [db]
+        [db, getDiagram, isAuthenticated, user?.id, session?.access_token]
     );
 
     const deleteDiagram: StorageContext['deleteDiagram'] = useCallback(
@@ -871,8 +916,20 @@ export const StorageProvider: React.FC<React.PropsWithChildren> = ({
                 db.db_custom_types.where('diagramId').equals(id).delete(),
                 db.notes.where('diagramId').equals(id).delete(),
             ]);
+
+            if (isAuthenticated && user?.id) {
+                try {
+                    await deleteDiagramFromCloud({
+                        diagramId: id,
+                        userId: user.id,
+                        accessToken: session?.access_token,
+                    });
+                } catch (error) {
+                    console.error('Cloud sync failed on deleteDiagram', error);
+                }
+            }
         },
-        [db]
+        [db, isAuthenticated, user?.id, session?.access_token]
     );
 
     return (
