@@ -41,7 +41,7 @@ export const LoginPage: React.FC = () => {
         <section className="mx-auto flex min-h-dvh w-full max-w-lg flex-col justify-center px-4">
             <h1 className="text-2xl font-bold">Iniciar sesión</h1>
             <p className="mb-6 mt-2 text-muted-foreground">
-                Activa sincronización automática en la nube con Supabase.
+                Activa sincronización automática en la nube.
             </p>
             {!isSupabaseConfigured && (
                 <p className="mb-4 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm">

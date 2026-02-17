@@ -48,6 +48,8 @@ const EditorPageComponent: React.FC = () => {
     const { initialDiagram } = useDiagramLoader();
 
     useEffect(() => {
+        return;
+        
         if (HIDE_CHARTDB_CLOUD) {
             return;
         }
