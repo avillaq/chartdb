@@ -9,6 +9,7 @@ export interface AuthContext {
     isAuthenticated: boolean;
     signInWithOtp: (email: string) => Promise<{ error: string | null }>;
     signOut: () => Promise<void>;
+    getAccessToken: () => Promise<string | null>;
 }
 
 export const authContext = createContext<AuthContext>({
@@ -18,4 +19,5 @@ export const authContext = createContext<AuthContext>({
     isAuthenticated: false,
     signInWithOtp: emptyFn,
     signOut: emptyFn,
+    getAccessToken: emptyFn,
 });

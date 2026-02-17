@@ -18,7 +18,7 @@ import { deleteDiagramFromCloud, syncDiagramToCloud } from '@/lib/cloud-sync';
 export const StorageProvider: React.FC<React.PropsWithChildren> = ({
     children,
 }) => {
-    const { user, session, isAuthenticated } = useAuth();
+    const { user, isAuthenticated, getAccessToken } = useAuth();
 
     const db = useMemo(() => {
         const dexieDB = new Dexie('ChartDB') as Dexie & {
@@ -685,7 +685,7 @@ export const StorageProvider: React.FC<React.PropsWithChildren> = ({
                     await syncDiagramToCloud({
                         diagram,
                         userId: user.id,
-                        accessToken: session?.access_token,
+                        accessToken: (await getAccessToken()) ?? undefined,
                     });
                 } catch (error) {
                     console.error('Cloud sync failed on addDiagram', error);
@@ -702,7 +702,7 @@ export const StorageProvider: React.FC<React.PropsWithChildren> = ({
             addNote,
             isAuthenticated,
             user?.id,
-            session?.access_token,
+            getAccessToken,
         ]
     );
 
@@ -891,7 +891,7 @@ export const StorageProvider: React.FC<React.PropsWithChildren> = ({
                         await syncDiagramToCloud({
                             diagram,
                             userId: user.id,
-                            accessToken: session?.access_token,
+                            accessToken: (await getAccessToken()) ?? undefined,
                         });
                     } catch (error) {
                         console.error(
@@ -902,7 +902,7 @@ export const StorageProvider: React.FC<React.PropsWithChildren> = ({
                 }
             }
         },
-        [db, getDiagram, isAuthenticated, user?.id, session?.access_token]
+        [db, getDiagram, isAuthenticated, user?.id, getAccessToken]
     );
 
     const deleteDiagram: StorageContext['deleteDiagram'] = useCallback(
@@ -922,14 +922,14 @@ export const StorageProvider: React.FC<React.PropsWithChildren> = ({
                     await deleteDiagramFromCloud({
                         diagramId: id,
                         userId: user.id,
-                        accessToken: session?.access_token,
+                        accessToken: (await getAccessToken()) ?? undefined,
                     });
                 } catch (error) {
                     console.error('Cloud sync failed on deleteDiagram', error);
                 }
             }
         },
-        [db, isAuthenticated, user?.id, session?.access_token]
+        [db, isAuthenticated, user?.id, getAccessToken]
     );
 
     return (

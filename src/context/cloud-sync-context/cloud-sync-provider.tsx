@@ -16,7 +16,7 @@ export const CloudSyncProvider: React.FC<React.PropsWithChildren> = ({
     children,
 }) => {
     const { currentDiagram } = useChartDB();
-    const { user, session, isAuthenticated } = useAuth();
+    const { user, isAuthenticated, getAccessToken } = useAuth();
     const [status, setStatus] = useState<SyncStatus>('idle');
     const [lastSyncedAt, setLastSyncedAt] = useState<Date | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -36,7 +36,7 @@ export const CloudSyncProvider: React.FC<React.PropsWithChildren> = ({
             await syncDiagramToCloud({
                 diagram: currentDiagram,
                 userId: user.id,
-                accessToken: session?.access_token,
+                accessToken: (await getAccessToken()) ?? undefined,
             });
             setStatus('synced');
             setLastSyncedAt(new Date());
@@ -48,7 +48,7 @@ export const CloudSyncProvider: React.FC<React.PropsWithChildren> = ({
                     : 'No se pudo sincronizar con la nube.'
             );
         }
-    }, [currentDiagram, isAuthenticated, user, session?.access_token]);
+    }, [currentDiagram, isAuthenticated, user, getAccessToken]);
 
     useEffect(() => {
         if (!isAuthenticated || !currentDiagram?.id) {
