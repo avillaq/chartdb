@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ChartDBLogo from '@/assets/logo-light.png';
 import ChartDBDarkLogo from '@/assets/logo-dark.png';
 import { useTheme } from '@/hooks/use-theme';
@@ -6,11 +7,16 @@ import { DiagramName } from './diagram-name';
 import { LastSaved } from './last-saved';
 import { LanguageNav } from './language-nav/language-nav';
 import { Menu } from './menu/menu';
+import { useAuth } from '@/context/auth-context/use-auth';
+import { Button } from '@/components/button/button';
+import { SyncStatus } from '@/components/sync-status/sync-status';
 
 export interface TopNavbarProps {}
 
 export const TopNavbar: React.FC<TopNavbarProps> = () => {
     const { effectiveTheme } = useTheme();
+    const navigate = useNavigate();
+    const { isAuthenticated, signOut } = useAuth();
 
     const renderStars = useCallback(() => {
         return (
@@ -48,8 +54,26 @@ export const TopNavbar: React.FC<TopNavbarProps> = () => {
             <DiagramName />
             <div className="hidden flex-1 items-center justify-end gap-2 sm:flex">
                 <LastSaved />
+                <SyncStatus />
                 {renderStars()}
                 <LanguageNav />
+                {isAuthenticated ? (
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => void signOut()}
+                    >
+                        Logout
+                    </Button>
+                ) : (
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => navigate('/login')}
+                    >
+                        Login
+                    </Button>
+                )}
             </div>
         </nav>
     );
