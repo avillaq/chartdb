@@ -1901,11 +1901,9 @@ export async function fromPostgres(
                                             targetTableId,
                                             updateAction:
                                                 reference.on_update ??
-                                                reference.onUpdate ??
                                                 onUpdateMatch?.[1],
                                             deleteAction:
                                                 reference.on_delete ??
-                                                reference.onDelete ??
                                                 onDeleteMatch?.[1],
                                             sourceCardinality: 'many',
                                             targetCardinality: 'one',

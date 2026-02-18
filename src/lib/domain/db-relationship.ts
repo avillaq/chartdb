@@ -31,12 +31,7 @@ const referentialActionValues = [
     'set_default',
 ] as const;
 
-const referentialActionSchema = z.union(
-    referentialActionValues.map((value) => z.literal(value)) as [
-        z.ZodLiteral<(typeof referentialActionValues)[number]>,
-        ...z.ZodLiteral<(typeof referentialActionValues)[number]>[],
-    ]
-);
+const referentialActionSchema = z.enum(referentialActionValues);
 
 export const dbRelationshipSchema: z.ZodType<DBRelationship> = z.object({
     id: z.string(),
