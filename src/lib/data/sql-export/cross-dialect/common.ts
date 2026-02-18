@@ -5,6 +5,7 @@
 
 import type { Diagram } from '@/lib/domain/diagram';
 import type { DBTable } from '@/lib/domain/db-table';
+import { buildReferentialActionsSQL } from '@/lib/domain/db-relationship';
 
 export function isFunction(value: string): boolean {
     // Common SQL functions
@@ -123,7 +124,7 @@ export function getInlineFK(table: DBTable, diagram: Diagram): string {
                 ? `"${targetTable.schema}"."${targetTable.name}"`
                 : `"${targetTable.name}"`;
 
-            return `    FOREIGN KEY ("${sourceField.name}") REFERENCES ${targetTableName}("${targetField.name}")`;
+            return `    FOREIGN KEY ("${sourceField.name}") REFERENCES ${targetTableName}("${targetField.name}")${buildReferentialActionsSQL(r)}`;
         })
         .filter(Boolean);
 
