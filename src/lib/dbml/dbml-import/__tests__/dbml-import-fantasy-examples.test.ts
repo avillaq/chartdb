@@ -937,6 +937,10 @@ Note dragon_note {
             // Verify all indexes are imported correctly
             expect(hoardsTable?.indexes).toHaveLength(4); // 3 from DBML + 1 implicit PK index
 
+            const treasureRelationship = diagram.relationships?.[0];
+            expect(treasureRelationship?.onDelete).toBe('cascade');
+            expect(treasureRelationship?.onUpdate).toBe('cascade');
+
             // Verify named indexes
             const uniqueDragonIndex = hoardsTable?.indexes.find(
                 (idx) => idx.name === 'idx_unique_dragon'

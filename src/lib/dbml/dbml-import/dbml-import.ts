@@ -643,11 +643,17 @@ export const importDBMLToDiagram = async (
                                 DBMLEndpoint,
                             ],
                             onDelete: (
-                                ref as { settings?: { delete?: string } }
-                            ).settings?.delete,
+                                ref as {
+                                    onDelete?: string;
+                                    settings?: { delete?: string };
+                                }
+                            ).onDelete,
                             onUpdate: (
-                                ref as { settings?: { update?: string } }
-                            ).settings?.update,
+                                ref as {
+                                    onUpdate?: string;
+                                    settings?: { update?: string };
+                                }
+                            ).onUpdate,
                         });
                     }
                 });
