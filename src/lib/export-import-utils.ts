@@ -32,6 +32,7 @@ export const diagramFromJSONInput = (json: string): Diagram => {
 
     const diagram = diagramSchema.parse({
         ...loadedDiagram,
+        databaseEdition: loadedDiagram.databaseEdition ?? undefined,
         createdAt: new Date(),
         updatedAt: new Date(),
     });

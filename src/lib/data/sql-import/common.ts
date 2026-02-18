@@ -1,7 +1,11 @@
 import type { Diagram } from '@/lib/domain/diagram';
 import { generateDiagramId, generateId } from '@/lib/utils';
 import type { DBTable } from '@/lib/domain/db-table';
-import type { Cardinality, DBRelationship } from '@/lib/domain/db-relationship';
+import {
+    parseReferentialAction,
+    type Cardinality,
+    type DBRelationship,
+} from '@/lib/domain/db-relationship';
 import type { DBField } from '@/lib/domain/db-field';
 import type { DBIndex } from '@/lib/domain/db-index';
 import type { DBCheckConstraint } from '@/lib/domain/db-check-constraint';
@@ -1039,6 +1043,8 @@ export function convertToChartDBDiagram(
             targetFieldId: sourceField.id,
             sourceCardinality,
             targetCardinality,
+            onDelete: parseReferentialAction(rel.deleteAction),
+            onUpdate: parseReferentialAction(rel.updateAction),
             createdAt: Date.now(),
         });
     });

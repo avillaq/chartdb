@@ -8,7 +8,10 @@ import {
 import type { Diagram } from '@/lib/domain/diagram';
 import type { DBTable } from '@/lib/domain/db-table';
 import type { DBField } from '@/lib/domain/db-field';
-import type { DBRelationship } from '@/lib/domain/db-relationship';
+import {
+    buildReferentialActionsSQL,
+    type DBRelationship,
+} from '@/lib/domain/db-relationship';
 
 function parseSQLiteDefault(field: DBField): string {
     if (!field.default) {
@@ -281,7 +284,7 @@ export function exportSQLite({
                     // If this foreign key belongs to the current table, add it
                     if (fkTable.id === table.id) {
                         tableForeignKeys.push(
-                            `    FOREIGN KEY("${fkField.name}") REFERENCES "${refTable.name}"("${refField.name}")`
+                            `    FOREIGN KEY("${fkField.name}") REFERENCES "${refTable.name}"("${refField.name}")${buildReferentialActionsSQL(r)}`
                         );
                     }
                 });

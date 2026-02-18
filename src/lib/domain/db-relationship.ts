@@ -11,8 +11,32 @@ export interface DBRelationship {
     targetFieldId: string;
     sourceCardinality: Cardinality;
     targetCardinality: Cardinality;
+    onDelete?: ReferentialAction;
+    onUpdate?: ReferentialAction;
     createdAt: number;
 }
+
+export type ReferentialAction =
+    | 'no_action'
+    | 'restrict'
+    | 'cascade'
+    | 'set_null'
+    | 'set_default';
+
+const referentialActionValues = [
+    'no_action',
+    'restrict',
+    'cascade',
+    'set_null',
+    'set_default',
+] as const;
+
+const referentialActionSchema = z.union(
+    referentialActionValues.map((value) => z.literal(value)) as [
+        z.ZodLiteral<(typeof referentialActionValues)[number]>,
+        ...z.ZodLiteral<(typeof referentialActionValues)[number]>[],
+    ]
+);
 
 export const dbRelationshipSchema: z.ZodType<DBRelationship> = z.object({
     id: z.string(),
@@ -25,8 +49,52 @@ export const dbRelationshipSchema: z.ZodType<DBRelationship> = z.object({
     targetFieldId: z.string(),
     sourceCardinality: z.union([z.literal('one'), z.literal('many')]),
     targetCardinality: z.union([z.literal('one'), z.literal('many')]),
+    onDelete: referentialActionSchema.optional(),
+    onUpdate: referentialActionSchema.optional(),
     createdAt: z.number(),
 });
+
+export const referentialActionToSQL = (action?: ReferentialAction): string => {
+    if (!action) {
+        return 'NO ACTION';
+    }
+
+    return action.replace('_', ' ').toUpperCase();
+};
+
+export const buildReferentialActionsSQL = (relationship: {
+    onDelete?: ReferentialAction;
+    onUpdate?: ReferentialAction;
+}): string => {
+    const clauses: string[] = [];
+
+    if (relationship.onDelete) {
+        clauses.push(
+            ` ON DELETE ${referentialActionToSQL(relationship.onDelete)}`
+        );
+    }
+
+    if (relationship.onUpdate) {
+        clauses.push(
+            ` ON UPDATE ${referentialActionToSQL(relationship.onUpdate)}`
+        );
+    }
+
+    return clauses.join('');
+};
+
+export const parseReferentialAction = (
+    action?: string | null
+): ReferentialAction | undefined => {
+    if (!action) {
+        return undefined;
+    }
+
+    const normalized = action.trim().toLowerCase().replace(/\s+/g, '_');
+    return referentialActionValues.includes(normalized as ReferentialAction)
+        ? (normalized as ReferentialAction)
+        : undefined;
+};
 
 export type RelationshipType =
     | 'one_to_one'

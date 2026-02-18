@@ -4,9 +4,26 @@ import type {
     DBRelationship,
     DBTable,
 } from '@/lib/domain';
-import { schemaNameToDomainSchemaName } from '@/lib/domain';
+import {
+    parseReferentialAction,
+    schemaNameToDomainSchemaName,
+} from '@/lib/domain';
 import type { ForeignKeyInfo } from '../metadata-types/foreign-key-info';
 import { generateId } from '@/lib/utils';
+
+const parseRelationshipActionsFromDefinition = (fkDef: string) => {
+    const deleteMatch = fkDef.match(
+        /ON\s+DELETE\s+(NO\s+ACTION|RESTRICT|CASCADE|SET\s+NULL|SET\s+DEFAULT)/i
+    );
+    const updateMatch = fkDef.match(
+        /ON\s+UPDATE\s+(NO\s+ACTION|RESTRICT|CASCADE|SET\s+NULL|SET\s+DEFAULT)/i
+    );
+
+    return {
+        onDelete: parseReferentialAction(deleteMatch?.[1]),
+        onUpdate: parseReferentialAction(updateMatch?.[1]),
+    };
+};
 
 const determineCardinality = (
     field: DBField,
@@ -67,6 +84,9 @@ export const createRelationshipsFromMetadata = ({
                     isSourceTablePKComplex
                 );
 
+                const { onDelete, onUpdate } =
+                    parseRelationshipActionsFromDefinition(fk.fk_def);
+
                 return {
                     id: generateId(),
                     name: fk.foreign_key_name,
@@ -78,6 +98,8 @@ export const createRelationshipsFromMetadata = ({
                     targetFieldId: sourceField.id,
                     sourceCardinality,
                     targetCardinality,
+                    onDelete,
+                    onUpdate,
                     createdAt: Date.now(),
                 };
             }

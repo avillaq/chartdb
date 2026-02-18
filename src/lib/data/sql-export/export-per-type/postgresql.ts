@@ -9,7 +9,10 @@ import {
 import type { Diagram } from '@/lib/domain/diagram';
 import type { DBTable } from '@/lib/domain/db-table';
 import type { DBField } from '@/lib/domain/db-field';
-import type { DBRelationship } from '@/lib/domain/db-relationship';
+import {
+    buildReferentialActionsSQL,
+    type DBRelationship,
+} from '@/lib/domain/db-relationship';
 import type { DBCustomType } from '@/lib/domain/db-custom-type';
 import { DBCustomTypeKind } from '@/lib/domain/db-custom-type';
 
@@ -535,7 +538,7 @@ export function exportPostgreSQL({
 
                 return {
                     schema: fkTable.schema || 'public',
-                    sql: `ALTER TABLE ${fkTableName} ADD CONSTRAINT ${constraintName} FOREIGN KEY("${fkField.name}") REFERENCES ${refTableName}("${refField.name}");`,
+                    sql: `ALTER TABLE ${fkTableName} ADD CONSTRAINT ${constraintName} FOREIGN KEY("${fkField.name}") REFERENCES ${refTableName}("${refField.name}")${buildReferentialActionsSQL(r)};`,
                 };
             })
             .filter(Boolean); // Remove empty objects

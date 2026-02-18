@@ -1174,8 +1174,10 @@ function processAlterTable(
                             targetColumn: targetColumnName,
                             sourceTableId: table.id,
                             targetTableId: '', // Will be filled later
-                            updateAction: reference.on_update,
-                            deleteAction: reference.on_delete,
+                            updateAction:
+                                reference.on_update ?? reference.onUpdate,
+                            deleteAction:
+                                reference.on_delete ?? reference.onDelete,
                         });
                     }
                 }
