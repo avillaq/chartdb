@@ -60,7 +60,7 @@ export const ChartDBProvider: React.FC<
         DatabaseEdition | undefined
     >();
     const [tables, setTables] = useState<DBTable[]>(diagram?.tables ?? []);
-    const [relationships, setRelationships] = useState<DBRelationship[]>(
+    const [relationshipsState, setRelationships] = useState<DBRelationship[]>(
         diagram?.relationships ?? []
     );
     const [dependencies, setDependencies] = useState<DBDependency[]>(
@@ -71,6 +71,8 @@ export const ChartDBProvider: React.FC<
         diagram?.customTypes ?? []
     );
     const [notes, setNotes] = useState<Note[]>(diagram?.notes ?? []);
+
+    const relationships = relationshipsState;
 
     const { events: diffEvents } = useDiff();
 
@@ -1275,16 +1277,36 @@ export const ChartDBProvider: React.FC<
             relationships: DBRelationship[],
             options = { updateHistory: true }
         ) => {
+            const existingRelationshipIds = new Set(
+                relationshipsState.map((relationship) => relationship.id)
+            );
+            const uniqueRelationshipIds = new Set<string>();
+            const relationshipsToAdd = relationships.filter((relationship) => {
+                if (
+                    existingRelationshipIds.has(relationship.id) ||
+                    uniqueRelationshipIds.has(relationship.id)
+                ) {
+                    return false;
+                }
+
+                uniqueRelationshipIds.add(relationship.id);
+                return true;
+            });
+
+            if (relationshipsToAdd.length === 0) {
+                return;
+            }
+
             setRelationships((currentRelationships) => [
                 ...currentRelationships,
-                ...relationships,
+                ...relationshipsToAdd,
             ]);
 
             const updatedAt = new Date();
             setDiagramUpdatedAt(updatedAt);
 
             await Promise.all([
-                ...relationships.map((relationship) =>
+                ...relationshipsToAdd.map((relationship) =>
                     db.addRelationship({ diagramId, relationship })
                 ),
                 db.updateDiagram({ id: diagramId, attributes: { updatedAt } }),
@@ -1293,15 +1315,22 @@ export const ChartDBProvider: React.FC<
             if (options.updateHistory) {
                 addUndoAction({
                     action: 'addRelationships',
-                    redoData: { relationships },
+                    redoData: { relationships: relationshipsToAdd },
                     undoData: {
-                        relationshipIds: relationships.map((r) => r.id),
+                        relationshipIds: relationshipsToAdd.map((r) => r.id),
                     },
                 });
                 resetRedoStack();
             }
         },
-        [db, diagramId, setRelationships, addUndoAction, resetRedoStack]
+        [
+            db,
+            diagramId,
+            relationshipsState,
+            setRelationships,
+            addUndoAction,
+            resetRedoStack,
+        ]
     );
 
     const addRelationship: ChartDBContext['addRelationship'] = useCallback(
@@ -1944,11 +1973,42 @@ export const ChartDBProvider: React.FC<
 
             if (diagram) {
                 loadDiagramFromData(diagram);
+                return diagram;
             }
 
-            return diagram;
+            setDiagramId('');
+            setDiagramName('');
+            setDatabaseType(DatabaseType.GENERIC);
+            setDatabaseEdition(undefined);
+            setTables([]);
+            setRelationships([]);
+            setDependencies([]);
+            setAreas([]);
+            setCustomTypes([]);
+            setNotes([]);
+            setHighlightedCustomTypeId(undefined);
+            resetRedoStack();
+            resetUndoStack();
+
+            return undefined;
         },
-        [storageDB, loadDiagramFromData]
+        [
+            storageDB,
+            loadDiagramFromData,
+            resetRedoStack,
+            resetUndoStack,
+            setDiagramId,
+            setDiagramName,
+            setDatabaseType,
+            setDatabaseEdition,
+            setTables,
+            setRelationships,
+            setDependencies,
+            setAreas,
+            setCustomTypes,
+            setNotes,
+            setHighlightedCustomTypeId,
+        ]
     );
 
     // Custom type operations

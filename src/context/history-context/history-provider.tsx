@@ -8,10 +8,10 @@ export const HistoryProvider: React.FC<React.PropsWithChildren> = ({
     children,
 }) => {
     const {
+        popUndoAction,
+        popRedoAction,
         addRedoAction,
         addUndoAction,
-        undoStack,
-        redoStack,
         hasRedo,
         hasUndo,
     } = useRedoUndoStack();
@@ -382,7 +382,7 @@ export const HistoryProvider: React.FC<React.PropsWithChildren> = ({
     );
 
     const undo = async () => {
-        const action = undoStack.pop();
+        const action = popUndoAction();
         if (!action) {
             return;
         }
@@ -397,7 +397,7 @@ export const HistoryProvider: React.FC<React.PropsWithChildren> = ({
     };
 
     const redo = async () => {
-        const action = redoStack.pop();
+        const action = popRedoAction();
         if (!action) {
             return;
         }
