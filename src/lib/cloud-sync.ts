@@ -8,11 +8,13 @@ const request = async ({
     method,
     accessToken,
     body,
+    prefer,
 }: {
     path: string;
     method: 'POST' | 'DELETE';
     accessToken: string;
     body?: unknown;
+    prefer?: string;
 }) => {
     if (method === 'POST' && Array.isArray(body) && body.length === 0) {
         return;
@@ -24,7 +26,7 @@ const request = async ({
             apikey: supabaseAnonKey,
             Authorization: `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
-            Prefer: 'resolution=merge-duplicates,return=minimal',
+            Prefer: prefer ?? 'resolution=merge-duplicates,return=minimal',
         },
         body: body ? JSON.stringify(body) : undefined,
     });
@@ -234,22 +236,50 @@ export const syncDiagramToCloud = async ({
         return;
     }
 
-    await request({
-        path: 'diagrams',
-        method: 'POST',
-        accessToken,
-        body: [
-            {
-                id: diagram.id,
-                user_id: userId,
-                name: diagram.name,
-                database_type: diagram.databaseType,
-                database_edition: diagram.databaseEdition,
-                created_at: diagram.createdAt,
-                updated_at: diagram.updatedAt,
-            },
-        ],
-    });
+    const diagramRow = {
+        id: diagram.id,
+        user_id: userId,
+        name: diagram.name,
+        database_type: diagram.databaseType,
+        database_edition: diagram.databaseEdition,
+        created_at: diagram.createdAt,
+        updated_at: diagram.updatedAt,
+    };
+
+    try {
+        await request({
+            path: 'diagrams',
+            method: 'POST',
+            accessToken,
+            body: [diagramRow],
+        });
+    } catch (error) {
+        // Some deployments are missing UPDATE policies for diagrams.
+        // In that case UPSERT (merge-duplicates) fails with 403.
+        // Fallback to delete+insert to keep sync working.
+        const errorMessage =
+            error instanceof Error ? error.message.toLowerCase() : '';
+        const isForbidden = errorMessage.includes('403');
+
+        if (!isForbidden) {
+            throw error;
+        }
+
+        await request({
+            path: `diagrams?id=eq.${diagram.id}&user_id=eq.${userId}`,
+            method: 'DELETE',
+            accessToken,
+            prefer: 'return=minimal',
+        });
+
+        await request({
+            path: 'diagrams',
+            method: 'POST',
+            accessToken,
+            body: [diagramRow],
+            prefer: 'return=minimal',
+        });
+    }
 
     await removeDiagramData({ diagramId: diagram.id, userId, accessToken });
 
