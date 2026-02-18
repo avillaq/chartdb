@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useEffect, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import type { ExportImageContext, ImageType } from './export-image-context';
 import { exportImageContext } from './export-image-context';
 import { toJpeg, toPng, toSvg } from 'html-to-image';
@@ -6,8 +6,6 @@ import { useReactFlow } from '@xyflow/react';
 import { useChartDB } from '@/hooks/use-chartdb';
 import { useFullScreenLoader } from '@/hooks/use-full-screen-spinner';
 import { useTheme } from '@/hooks/use-theme';
-import logoDark from '@/assets/logo-dark.png';
-import logoLight from '@/assets/logo-light.png';
 import type { EffectiveTheme } from '../theme-context/theme-context';
 
 export const ExportImageProvider: React.FC<React.PropsWithChildren> = ({
@@ -17,24 +15,6 @@ export const ExportImageProvider: React.FC<React.PropsWithChildren> = ({
     const { setNodes, getViewport } = useReactFlow();
     const { effectiveTheme } = useTheme();
     const { diagramName } = useChartDB();
-    const [logoBase64, setLogoBase64] = useState<string>('');
-
-    useEffect(() => {
-        // Convert logo to base64 on component mount
-        const img = new Image();
-        img.src = effectiveTheme === 'light' ? logoLight : logoDark;
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
-            const ctx = canvas.getContext('2d');
-            if (ctx) {
-                ctx.drawImage(img, 0, 0);
-                const base64 = canvas.toDataURL('image/png');
-                setLogoBase64(base64);
-            }
-        };
-    }, [effectiveTheme]);
 
     const downloadImage = useCallback(
         (dataUrl: string, type: ImageType) => {
@@ -289,7 +269,6 @@ export const ExportImageProvider: React.FC<React.PropsWithChildren> = ({
 
                     downloadImage(initialDataUrl, type);
                     return;
-                    
                 } finally {
                     // Restore original styles
                     originalStyles.forEach(
@@ -312,7 +291,6 @@ export const ExportImageProvider: React.FC<React.PropsWithChildren> = ({
             setNodes,
             showLoader,
             effectiveTheme,
-            logoBase64,
         ]
     );
 
