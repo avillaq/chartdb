@@ -77,7 +77,9 @@ export const AuthProvider: React.FC<React.PropsWithChildren> = ({
         setSession(null);
         setUser(null);
         localStorage.removeItem(SESSION_STORAGE_KEY);
-        Dexie.delete('ChartDB').then(() => console.log('ChartDB deleted')).catch(() => {});
+        Dexie.delete('ChartDB')
+            .then(() => console.log('ChartDB deleted'))
+            .catch(() => {});
     }, []);
 
     const refreshSession = useCallback(
