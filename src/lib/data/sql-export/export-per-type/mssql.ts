@@ -8,7 +8,10 @@ import {
 import type { Diagram } from '@/lib/domain/diagram';
 import type { DBTable } from '@/lib/domain/db-table';
 import type { DBField } from '@/lib/domain/db-field';
-import type { DBRelationship } from '@/lib/domain/db-relationship';
+import {
+    buildReferentialActionsSQL,
+    type DBRelationship,
+} from '@/lib/domain/db-relationship';
 
 function parseMSSQLDefault(field: DBField): string {
     if (!field.default) {
@@ -323,7 +326,7 @@ export function exportMSSQL({
 
                 return {
                     schema: fkTable.schema || 'dbo',
-                    sql: `ALTER TABLE ${fkTableName} ADD CONSTRAINT [${r.name}] FOREIGN KEY([${fkField.name}]) REFERENCES ${refTableName}([${refField.name}]);`,
+                    sql: `ALTER TABLE ${fkTableName} ADD CONSTRAINT [${r.name}] FOREIGN KEY([${fkField.name}]) REFERENCES ${refTableName}([${refField.name}])${buildReferentialActionsSQL(r)};`,
                 };
             })
             .filter(Boolean); // Remove empty objects
