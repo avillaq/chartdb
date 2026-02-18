@@ -365,7 +365,7 @@ export const StorageProvider: React.FC<React.PropsWithChildren> = ({
 
     const addRelationship: StorageContext['addRelationship'] = useCallback(
         async ({ diagramId, relationship }) => {
-            await db.db_relationships.add({
+            await db.db_relationships.put({
                 ...relationship,
                 diagramId,
             });
