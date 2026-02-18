@@ -15,9 +15,11 @@ import {
 import { useChartDB } from '@/hooks/use-chartdb';
 import type {
     DBRelationship,
+    ReferentialAction,
     RelationshipType,
 } from '@/lib/domain/db-relationship';
 import { determineRelationshipType } from '@/lib/domain/db-relationship';
+import { DatabaseType } from '@/lib/domain/database-type';
 import { useReactFlow } from '@xyflow/react';
 import {
     FileMinus2,
@@ -42,6 +44,7 @@ export const RelationshipListItemContent: React.FC<
         updateRelationship,
         removeRelationship,
         readonly,
+        databaseType,
     } = useChartDB();
     const { deleteElements } = useReactFlow();
     const { t } = useTranslation();
@@ -118,6 +121,31 @@ export const RelationshipListItemContent: React.FC<
     const sourceField = getField(
         relationship.sourceTableId,
         relationship.sourceFieldId
+    );
+
+    const supportsReferentialActions =
+        databaseType !== DatabaseType.CLICKHOUSE &&
+        databaseType !== DatabaseType.ORACLE;
+
+    const referentialActionOptions: Array<{
+        value: ReferentialAction;
+        label: string;
+    }> = useMemo(
+        () => [
+            { value: 'no_action', label: 'No action' },
+            { value: 'restrict', label: 'Restrict' },
+            { value: 'cascade', label: 'Cascade' },
+            { value: 'set_null', label: 'Set Null' },
+            { value: 'set_default', label: 'Set Default' },
+        ],
+        []
+    );
+
+    const updateReferentialAction = useCallback(
+        (key: 'onDelete' | 'onUpdate', value: ReferentialAction) => {
+            updateRelationship(relationship.id, { [key]: value });
+        },
+        [relationship.id, updateRelationship]
     );
 
     const deleteRelationshipHandler = useCallback(() => {
@@ -235,6 +263,78 @@ export const RelationshipListItemContent: React.FC<
                         </SelectContent>
                     </Select>
                 </div>
+
+                {supportsReferentialActions ? (
+                    <div className="grid grid-cols-1 gap-2 text-xs">
+                        <div className="font-bold text-subtitle">
+                            Referential Actions
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                            <div className="flex flex-col gap-1">
+                                <div className="text-subtitle">ON DELETE</div>
+                                <Select
+                                    value={relationship.onDelete ?? 'no_action'}
+                                    onValueChange={(value) =>
+                                        updateReferentialAction(
+                                            'onDelete',
+                                            value as ReferentialAction
+                                        )
+                                    }
+                                    disabled={readonly}
+                                >
+                                    <SelectTrigger className="h-8">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            {referentialActionOptions.map(
+                                                (option) => (
+                                                    <SelectItem
+                                                        key={option.value}
+                                                        value={option.value}
+                                                    >
+                                                        {option.label}
+                                                    </SelectItem>
+                                                )
+                                            )}
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="flex flex-col gap-1">
+                                <div className="text-subtitle">ON UPDATE</div>
+                                <Select
+                                    value={relationship.onUpdate ?? 'no_action'}
+                                    onValueChange={(value) =>
+                                        updateReferentialAction(
+                                            'onUpdate',
+                                            value as ReferentialAction
+                                        )
+                                    }
+                                    disabled={readonly}
+                                >
+                                    <SelectTrigger className="h-8">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            {referentialActionOptions.map(
+                                                (option) => (
+                                                    <SelectItem
+                                                        key={option.value}
+                                                        value={option.value}
+                                                    >
+                                                        {option.label}
+                                                    </SelectItem>
+                                                )
+                                            )}
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+                    </div>
+                ) : null}
             </div>
             {!readonly ? (
                 <div className="flex flex-1 items-center justify-center pt-2">

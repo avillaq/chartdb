@@ -1880,6 +1880,13 @@ export async function fromPostgres(
                                         );
 
                                     if (sourceTableId && targetTableId) {
+                                        const onDeleteMatch = stmt.sql.match(
+                                            /ON\s+DELETE\s+(NO\s+ACTION|RESTRICT|CASCADE|SET\s+NULL|SET\s+DEFAULT)/i
+                                        );
+                                        const onUpdateMatch = stmt.sql.match(
+                                            /ON\s+UPDATE\s+(NO\s+ACTION|RESTRICT|CASCADE|SET\s+NULL|SET\s+DEFAULT)/i
+                                        );
+
                                         relationships.push({
                                             name:
                                                 createDefs.constraint ||
@@ -1892,8 +1899,14 @@ export async function fromPostgres(
                                             targetColumn: targetColumns[i],
                                             sourceTableId,
                                             targetTableId,
-                                            updateAction: reference.on_update,
-                                            deleteAction: reference.on_delete,
+                                            updateAction:
+                                                reference.on_update ??
+                                                reference.onUpdate ??
+                                                onUpdateMatch?.[1],
+                                            deleteAction:
+                                                reference.on_delete ??
+                                                reference.onDelete ??
+                                                onDeleteMatch?.[1],
                                             sourceCardinality: 'many',
                                             targetCardinality: 'one',
                                         });
@@ -2100,6 +2113,13 @@ export async function fromPostgres(
                     targetSchema
                 );
 
+                const onDeleteMatch = stmt.sql.match(
+                    /ON\s+DELETE\s+(NO\s+ACTION|RESTRICT|CASCADE|SET\s+NULL|SET\s+DEFAULT)/i
+                );
+                const onUpdateMatch = stmt.sql.match(
+                    /ON\s+UPDATE\s+(NO\s+ACTION|RESTRICT|CASCADE|SET\s+NULL|SET\s+DEFAULT)/i
+                );
+
                 if (sourceTableId && targetTableId) {
                     relationships.push({
                         name: constraintName,
@@ -2111,6 +2131,8 @@ export async function fromPostgres(
                         targetColumn,
                         sourceTableId,
                         targetTableId,
+                        deleteAction: onDeleteMatch?.[1],
+                        updateAction: onUpdateMatch?.[1],
                         sourceCardinality: 'many',
                         targetCardinality: 'one',
                     });

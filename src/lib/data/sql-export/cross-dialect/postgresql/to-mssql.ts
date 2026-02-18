@@ -7,7 +7,10 @@
 import type { Diagram } from '@/lib/domain/diagram';
 import type { DBTable } from '@/lib/domain/db-table';
 import type { DBField } from '@/lib/domain/db-field';
-import type { DBRelationship } from '@/lib/domain/db-relationship';
+import {
+    buildReferentialActionsSQL,
+    type DBRelationship,
+} from '@/lib/domain/db-relationship';
 import type { DBCustomType } from '@/lib/domain/db-custom-type';
 import {
     exportFieldComment,
@@ -670,7 +673,7 @@ export function exportPostgreSQLToMSSQL({
 
                 return {
                     schema: fkTable.schema || 'dbo',
-                    sql: `ALTER TABLE ${fkTableName} ADD CONSTRAINT [${r.name || `fk_${fkTable.name}_${fkField.name}`}] FOREIGN KEY([${fkField.name}]) REFERENCES ${refTableName}([${refField.name}]);`,
+                    sql: `ALTER TABLE ${fkTableName} ADD CONSTRAINT [${r.name || `fk_${fkTable.name}_${fkField.name}`}] FOREIGN KEY([${fkField.name}]) REFERENCES ${refTableName}([${refField.name}])${buildReferentialActionsSQL(r)};`,
                 };
             })
             .filter(Boolean) as { schema: string; sql: string }[];

@@ -66,7 +66,7 @@ CREATE TABLE "public"."users" (
 
 -- Foreign key constraints
 -- Schema: public
-ALTER TABLE "public"."playlists" ADD CONSTRAINT "fk_playlists_user_id_users_user_id" FOREIGN KEY("user_id") REFERENCES "public"."users"("user_id");
+ALTER TABLE "public"."playlists" ADD CONSTRAINT "fk_playlists_user_id_users_user_id" FOREIGN KEY("user_id") REFERENCES "public"."users"("user_id") ON DELETE CASCADE ON UPDATE SET NULL;
         `;
 
         const diagram = await sqlImportToDiagram({
@@ -110,6 +110,8 @@ ALTER TABLE "public"."playlists" ADD CONSTRAINT "fk_playlists_user_id_users_user
         expect(relationship?.targetTableId).toBe(playlistTable?.id);
         expect(relationship?.targetFieldId).toBe(playlistUserIdField?.id);
         expect(relationship?.targetCardinality).toBe('many');
+        expect(relationship?.onDelete).toBe('cascade');
+        expect(relationship?.onUpdate).toBe('set_null');
     });
 
     it('should parse foreign key constraints properly - MySQL', async () => {

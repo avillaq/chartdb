@@ -135,6 +135,16 @@ const fixProblematicFieldNames = (diagram: Diagram): Diagram => {
     };
 };
 
+const formatReferentialActionForDBML = (
+    action?: string
+): string | undefined => {
+    if (!action) {
+        return undefined;
+    }
+
+    return action.replace('_', ' ');
+};
+
 // Function to sanitize SQL before passing to the importer
 export const sanitizeSQLforDBML = (sql: string): string => {
     // Replace special characters in identifiers
@@ -1215,8 +1225,19 @@ const generateRelationshipsDbmlFromDiagram = (
         }
 
         // rel.name is already sanitized (fk_N_name format) by generateDBMLFromDiagram
+        const dbmlDeleteAction = formatReferentialActionForDBML(rel.onDelete);
+        const dbmlUpdateAction = formatReferentialActionForDBML(rel.onUpdate);
+
+        const actionSettings = [
+            dbmlDeleteAction ? `delete: ${dbmlDeleteAction}` : undefined,
+            dbmlUpdateAction ? `update: ${dbmlUpdateAction}` : undefined,
+        ].filter(Boolean);
+
+        const settings =
+            actionSettings.length > 0 ? ` [${actionSettings.join(', ')}]` : '';
+
         refStatements.push(
-            `Ref "${rel.name}":${leftRef} ${symbol} ${rightRef}`
+            `Ref "${rel.name}":${leftRef} ${symbol} ${rightRef}${settings}`
         );
     }
 

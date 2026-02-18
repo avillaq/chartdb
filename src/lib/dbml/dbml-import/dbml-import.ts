@@ -3,7 +3,11 @@ import type { Diagram } from '@/lib/domain/diagram';
 import { generateDiagramId, generateId, isStringEmpty } from '@/lib/utils';
 import type { DBTable } from '@/lib/domain/db-table';
 import { defaultSchemas } from '@/lib/data/default-schemas';
-import type { Cardinality, DBRelationship } from '@/lib/domain/db-relationship';
+import {
+    parseReferentialAction,
+    type Cardinality,
+    type DBRelationship,
+} from '@/lib/domain/db-relationship';
 import type { DBField } from '@/lib/domain/db-field';
 import type { DBCheckConstraint } from '@/lib/domain/db-check-constraint';
 import type { DataTypeData } from '@/lib/data/data-types/data-types';
@@ -307,6 +311,8 @@ interface DBMLEndpoint {
 
 interface DBMLRef {
     endpoints: [DBMLEndpoint, DBMLEndpoint];
+    onDelete?: string;
+    onUpdate?: string;
 }
 
 interface DBMLEnum {
@@ -636,6 +642,18 @@ export const importDBMLToDiagram = async (
                                 DBMLEndpoint,
                                 DBMLEndpoint,
                             ],
+                            onDelete: (
+                                ref as {
+                                    onDelete?: string;
+                                    settings?: { delete?: string };
+                                }
+                            ).onDelete,
+                            onUpdate: (
+                                ref as {
+                                    onUpdate?: string;
+                                    settings?: { update?: string };
+                                }
+                            ).onUpdate,
                         });
                     }
                 });
@@ -1006,6 +1024,9 @@ export const importDBMLToDiagram = async (
                     target.relation
                 );
 
+                const onDelete = parseReferentialAction(ref.onDelete);
+                const onUpdate = parseReferentialAction(ref.onUpdate);
+
                 return {
                     id: generateId(),
                     name: `${sourceTable.name}_${sourceField.name}_${targetTable.name}_${targetField.name}`,
@@ -1017,6 +1038,8 @@ export const importDBMLToDiagram = async (
                     targetFieldId: targetField.id,
                     sourceCardinality,
                     targetCardinality,
+                    onDelete,
+                    onUpdate,
                     createdAt: Date.now(),
                 };
             }
