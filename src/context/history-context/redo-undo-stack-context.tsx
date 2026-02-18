@@ -5,6 +5,8 @@ import { emptyFn } from '@/lib/utils';
 export interface RedoUndoStackContext {
     redoStack: RedoUndoAction[];
     undoStack: RedoUndoAction[];
+    popRedoAction: () => RedoUndoAction | undefined;
+    popUndoAction: () => RedoUndoAction | undefined;
     addRedoAction: (action: RedoUndoAction) => void;
     addUndoAction: (action: RedoUndoAction) => void;
     resetRedoStack: () => void;
@@ -16,6 +18,8 @@ export interface RedoUndoStackContext {
 export const redoUndoStackContext = createContext<RedoUndoStackContext>({
     redoStack: [],
     undoStack: [],
+    popRedoAction: () => undefined,
+    popUndoAction: () => undefined,
     addRedoAction: emptyFn,
     addUndoAction: emptyFn,
     resetRedoStack: emptyFn,
