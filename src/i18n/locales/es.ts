@@ -41,9 +41,8 @@ export const es: LanguageTranslation = {
                 theme: 'Tema',
                 show_dependencies: 'Mostrar dependencias',
                 hide_dependencies: 'Ocultar dependencias',
-                // TODO: Translate
-                show_minimap: 'Show Mini Map',
-                hide_minimap: 'Hide Mini Map',
+                show_minimap: 'Mostrar Mini Mapa',
+                hide_minimap: 'Ocultar Mini Mapa',
             },
             backup: {
                 backup: 'Respaldo',
@@ -111,8 +110,8 @@ export const es: LanguageTranslation = {
         clear: 'Limpiar',
         show_more: 'Mostrar más',
         show_less: 'Mostrar menos',
-        copy_to_clipboard: 'Copy to Clipboard',
-        copied: 'Copied!',
+        copy_to_clipboard: 'Copiar al Portapapeles',
+        copied: '¡Copiado!',
 
         side_panel: {
             view_all_options: 'Ver todas las opciones...',
@@ -122,12 +121,11 @@ export const es: LanguageTranslation = {
                 add_view: 'Agregar Vista',
                 filter: 'Filtrar',
                 collapse: 'Colapsar Todo',
-                // TODO: Translate
-                clear: 'Clear Filter',
-                no_results: 'No tables found matching your filter.',
-                // TODO: Translate
-                show_list: 'Show Table List',
-                show_dbml: 'Show DBML Editor',
+                clear: 'Limpiar Filtro',
+                no_results:
+                    'No se encontraron tablas que coincidan con tu filtro.',
+                show_list: 'Mostrar Lista de Tablas',
+                show_dbml: 'Mostrar Editor DBML',
                 all_hidden: 'Todas las tablas están ocultas',
                 show_all: 'Mostrar todo',
 
@@ -153,11 +151,9 @@ export const es: LanguageTranslation = {
                         comments: 'Comentarios',
                         no_comments: 'Sin comentarios',
                         delete_field: 'Eliminar Campo',
-                        // TODO: Translate
-                        default_value: 'Default Value',
-                        no_default: 'No default',
-                        // TODO: Translate
-                        character_length: 'Max Length',
+                        default_value: 'Valor por defecto',
+                        no_default: 'Sin valor por defecto',
+                        character_length: 'Longitud máxima',
                         precision: 'Precisión',
                         scale: 'Escala',
                     },
@@ -178,7 +174,7 @@ export const es: LanguageTranslation = {
                         change_schema: 'Cambiar Esquema',
                         add_field: 'Agregar Campo',
                         add_index: 'Agregar Índice',
-                        duplicate_table: 'Duplicate Table', // TODO: Translate
+                        duplicate_table: 'Duplicar Tabla',
                         delete_table: 'Eliminar Tabla',
                     },
                 },
@@ -313,10 +309,9 @@ export const es: LanguageTranslation = {
             undo: 'Deshacer',
             redo: 'Rehacer',
             reorder_diagram: 'Organizar Diagrama Automáticamente',
-            // TODO: Translate
-            clear_custom_type_highlight: 'Clear highlight for "{{typeName}}"',
+            clear_custom_type_highlight: 'Quitar resaltado para "{{typeName}}"',
             custom_type_highlight_tooltip:
-                'Highlighting "{{typeName}}" - Click to clear',
+                'Resaltando "{{typeName}}" - Haz clic para quitar resaltado',
             highlight_overlapping_tables: 'Resaltar tablas superpuestas',
             filter: 'Filtrar Tablas',
         },
@@ -348,8 +343,7 @@ export const es: LanguageTranslation = {
 
             cancel: 'Cancelar',
             back: 'Atrás',
-            // TODO: Translate
-            import_from_file: 'Import from File',
+            import_from_file: 'Importar desde Archivo',
             empty_diagram: 'Base de datos vacía',
             continue: 'Continuar',
             import: 'Importar',
@@ -436,12 +430,12 @@ export const es: LanguageTranslation = {
             scale_4x: '4x (Mejor calidad)',
             cancel: 'Cancelar',
             export: 'Exportar',
-            // TODO: Translate
-            advanced_options: 'Advanced Options',
-            pattern: 'Include background pattern',
-            pattern_description: 'Add subtle grid pattern to background.',
-            transparent: 'Transparent background',
-            transparent_description: 'Remove background color from image.',
+            advanced_options: 'Opciones Avanzadas',
+            pattern: 'Incluir patrón de fondo',
+            pattern_description:
+                'Agregar un patrón de cuadrícula sutil al fondo.',
+            transparent: 'Fondo transparente',
+            transparent_description: 'Eliminar el color de fondo de la imagen.',
         },
 
         new_table_schema_dialog: {
@@ -474,29 +468,27 @@ export const es: LanguageTranslation = {
             confirm: '¡Claro!',
         },
 
-        // TODO: Translate
         export_diagram_dialog: {
-            title: 'Export Diagram',
-            description: 'Choose the format for export:',
+            title: 'Exportar Diagrama',
+            description: 'Elige el formato para exportar:',
             format_json: 'JSON',
-            cancel: 'Cancel',
-            export: 'Export',
+            cancel: 'Cancelar',
+            export: 'Exportar',
             error: {
-                title: 'Error exporting diagram',
+                title: 'Error al exportar diagrama',
                 description:
-                    'Something went wrong. Need help? support@chartdb.io',
+                    'Algo salió mal. ¿Necesitas ayuda? support@chartdb.io',
             },
         },
-        // TODO: Translate
         import_diagram_dialog: {
-            title: 'Import Diagram',
-            description: 'Paste the diagram JSON below:',
-            cancel: 'Cancel',
-            import: 'Import',
+            title: 'Importar Diagrama',
+            description: 'Pega el JSON del diagrama a continuación:',
+            cancel: 'Cancelar',
+            import: 'Importar',
             error: {
-                title: 'Error importing diagram',
+                title: 'Error al importar diagrama',
                 description:
-                    'The diagram JSON is invalid. Please check the JSON and try again. Need help? support@chartdb.io',
+                    'El JSON del diagrama no es válido. Por favor, revisa el JSON e inténtalo de nuevo. ¿Necesitas ayuda? support@chartdb.io',
             },
         },
         // TODO: Translate
@@ -530,9 +522,9 @@ export const es: LanguageTranslation = {
 
         table_node_context_menu: {
             edit_table: 'Editar Tabla',
-            duplicate_table: 'Duplicate Table', // TODO: Translate
+            duplicate_table: 'Duplicar Tabla',
             delete_table: 'Eliminar Tabla',
-            add_relationship: 'Add Relationship', // TODO: Translate
+            add_relationship: 'Agregar Relación',
         },
 
         canvas: {
