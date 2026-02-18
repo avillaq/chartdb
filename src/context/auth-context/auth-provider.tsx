@@ -74,10 +74,10 @@ export const AuthProvider: React.FC<React.PropsWithChildren> = ({
     );
 
     const clearSession = useCallback(() => {
-        localStorage.removeItem(SESSION_STORAGE_KEY);
-        Dexie.delete('ChartDB').then(() => console.log('ChartDB deleted')).catch(() => {});
         setSession(null);
         setUser(null);
+        localStorage.removeItem(SESSION_STORAGE_KEY);
+        Dexie.delete('ChartDB').then(() => console.log('ChartDB deleted')).catch(() => {});
     }, []);
 
     const refreshSession = useCallback(
