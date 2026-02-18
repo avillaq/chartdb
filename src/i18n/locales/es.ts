@@ -491,18 +491,19 @@ export const es: LanguageTranslation = {
                     'El JSON del diagrama no es válido. Por favor, revisa el JSON e inténtalo de nuevo. ¿Necesitas ayuda? support@chartdb.io',
             },
         },
-        // TODO: Translate
         import_dbml_dialog: {
-            example_title: 'Import Example DBML',
-            title: 'Import DBML',
-            description: 'Import a database schema from DBML format.',
-            import: 'Import',
-            cancel: 'Cancel',
-            skip_and_empty: 'Skip & Empty',
-            show_example: 'Show Example',
+            example_title: 'Importar Ejemplo DBML',
+            title: 'Importar DBML',
+            description:
+                'Importa un esquema de base de datos desde el formato DBML.',
+            import: 'Importar',
+            cancel: 'Cancelar',
+            skip_and_empty: 'Saltar y Vaciar',
+            show_example: 'Mostrar Ejemplo',
             error: {
                 title: 'Error',
-                description: 'Failed to parse DBML. Please check the syntax.',
+                description:
+                    'Error al analizar DBML. Por favor, revisa la sintaxis.',
             },
         },
         relationship_type: {
@@ -543,8 +544,8 @@ export const es: LanguageTranslation = {
             clear_filter: 'Limpiar filtro',
         },
 
-        // TODO: Add translations
-        snap_to_grid_tooltip: 'Snap to Grid (Hold {{key}})',
+        snap_to_grid_tooltip:
+            'Ajustar a la cuadrícula (Mantén presionada la tecla {{key}})',
 
         tool_tips: {
             double_click_to_edit: 'Doble clic para editar',
