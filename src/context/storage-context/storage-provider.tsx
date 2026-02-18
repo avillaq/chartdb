@@ -13,7 +13,11 @@ import type { DBCustomType } from '@/lib/domain/db-custom-type';
 import type { DiagramFilter } from '@/lib/domain/diagram-filter/diagram-filter';
 import type { Note } from '@/lib/domain/note';
 import { useAuth } from '@/context/auth-context/use-auth';
-import { deleteDiagramFromCloud, syncDiagramToCloud } from '@/lib/cloud-sync';
+import {
+    deleteDiagramFromCloud,
+    fetchDiagramsFromCloud,
+    syncDiagramToCloud,
+} from '@/lib/cloud-sync';
 
 export const StorageProvider: React.FC<React.PropsWithChildren> = ({
     children,
@@ -905,6 +909,52 @@ export const StorageProvider: React.FC<React.PropsWithChildren> = ({
         [db, getDiagram, isAuthenticated, user?.id, getAccessToken]
     );
 
+    const syncDiagramsFromCloud: StorageContext['syncDiagramsFromCloud'] =
+        useCallback(async (): Promise<Diagram[]> => {
+            if (!isAuthenticated || !user?.id) {
+                return [];
+            }
+
+            try {
+                const cloudDiagrams = await fetchDiagramsFromCloud({
+                    userId: user.id,
+                    accessToken: (await getAccessToken()) ?? undefined,
+                });
+
+                if (cloudDiagrams.length === 0) {
+                    return [];
+                }
+
+                await Promise.all(
+                    cloudDiagrams.map(async (diagram) => {
+                        const existingDiagram = await db.diagrams.get(
+                            diagram.id
+                        );
+
+                        if (existingDiagram) {
+                            return;
+                        }
+
+                        await addDiagram({ diagram });
+                    })
+                );
+
+                return cloudDiagrams;
+            } catch (error) {
+                console.error(
+                    'Cloud sync failed on syncDiagramsFromCloud',
+                    error
+                );
+                return [];
+            }
+        }, [
+            isAuthenticated,
+            user?.id,
+            getAccessToken,
+            db.diagrams,
+            addDiagram,
+        ]);
+
     const deleteDiagram: StorageContext['deleteDiagram'] = useCallback(
         async (id) => {
             await Promise.all([
@@ -942,6 +992,7 @@ export const StorageProvider: React.FC<React.PropsWithChildren> = ({
                 getDiagram,
                 updateDiagram,
                 deleteDiagram,
+                syncDiagramsFromCloud,
                 addTable,
                 getTable,
                 updateTable,

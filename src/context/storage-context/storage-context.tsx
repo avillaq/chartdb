@@ -49,6 +49,7 @@ export interface StorageContext {
         attributes: Partial<Diagram>;
     }) => Promise<void>;
     deleteDiagram: (id: string) => Promise<void>;
+    syncDiagramsFromCloud: () => Promise<Diagram[]>;
 
     // Table operations
     addTable: (params: { diagramId: string; table: DBTable }) => Promise<void>;
@@ -167,6 +168,7 @@ export const storageInitialValue: StorageContext = {
     getDiagram: emptyFn,
     updateDiagram: emptyFn,
     deleteDiagram: emptyFn,
+    syncDiagramsFromCloud: emptyFn,
 
     addTable: emptyFn,
     getTable: emptyFn,

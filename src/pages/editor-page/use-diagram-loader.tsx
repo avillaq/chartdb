@@ -17,7 +17,7 @@ export const useDiagramLoader = () => {
     const { showLoader, hideLoader } = useFullScreenLoader();
     const { openCreateDiagramDialog, openOpenDiagramDialog } = useDialog();
     const navigate = useNavigate();
-    const { listDiagrams } = useStorage();
+    const { listDiagrams, syncDiagramsFromCloud } = useStorage();
 
     const currentDiagramLoadingRef = useRef<string | undefined>(undefined);
 
@@ -55,7 +55,12 @@ export const useDiagramLoader = () => {
                     return;
                 }
             }
-            const diagrams = await listDiagrams();
+            let diagrams = await listDiagrams();
+
+            if (diagrams.length === 0) {
+                await syncDiagramsFromCloud();
+                diagrams = await listDiagrams();
+            }
 
             if (diagrams.length > 0) {
                 openOpenDiagramDialog({ canClose: false });
@@ -79,6 +84,7 @@ export const useDiagramLoader = () => {
         config,
         navigate,
         listDiagrams,
+        syncDiagramsFromCloud,
         loadDiagram,
         resetRedoStack,
         resetUndoStack,
