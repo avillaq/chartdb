@@ -6,6 +6,7 @@ import React, {
     useState,
 } from 'react';
 import { authContext } from './auth-context';
+import Dexie from 'dexie';
 import {
     isSupabaseConfigured,
     type SupabaseSession,
@@ -74,6 +75,7 @@ export const AuthProvider: React.FC<React.PropsWithChildren> = ({
 
     const clearSession = useCallback(() => {
         localStorage.removeItem(SESSION_STORAGE_KEY);
+        Dexie.delete('ChartDB').then(() => console.log('ChartDB deleted')).catch(() => {});
         setSession(null);
         setUser(null);
     }, []);
